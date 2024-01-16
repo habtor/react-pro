@@ -1,11 +1,40 @@
 import Navbar from "./Navbar";
 import useFetch from "./useFetch";
 import { useCartItems } from "./cartContext";
+import { useState } from "react";
 
 export default function Cart() {
   const { cartItemsIds, toggleCartItems, clearCart } = useCartItems();
   const url = "http://127.0.0.1:3001/";
   const { data: product, loading, error } = useFetch(url);
+  const [itemQuantities, setItemQuantities] = useState({});
+
+  const handelAddItemsCount = (itemId) => {
+    setItemQuantities((prevCount) => {
+      const newCount = { ...prevCount };
+
+      if (newCount[itemId] === undefined) {
+        newCount[itemId] = 2;
+      } else {
+        newCount[itemId]++;
+      }
+      return newCount;
+    });
+  };
+
+  const handelSubItemsCount = (itemId) => {
+    setItemQuantities((prevCount) => {
+      const newCount = { ...prevCount };
+      if (newCount[itemId] === undefined) {
+        newCount[itemId] = 2;
+      } else {
+        if (newCount[itemId] > 1) {
+          newCount[itemId]--;
+        }
+      }
+      return newCount;
+    });
+  };
 
   const handleToggleCartItems = (itemId) => {
     toggleCartItems(itemId);
@@ -18,7 +47,10 @@ export default function Cart() {
   let total = 0;
 
   cartProducts.forEach((element) => {
-    total += parseFloat(element.price);
+    if (itemQuantities[element._id]) {
+      element.price = parseFloat(element.price) * itemQuantities[element._id];
+    }
+    total += parseFloat(element.price) * (itemQuantities[element._id] || 1);
   });
 
   if (loading) {
@@ -50,9 +82,13 @@ export default function Cart() {
                   <p>356g</p>
                 </div>
                 <div class="quantity">
-                  <button>+</button>
-                  <h3>2</h3>
-                  <button>-</button>
+                  <button onClick={() => handelAddItemsCount(product._id)}>
+                    +
+                  </button>
+                  <h3>{itemQuantities[product._id] || 1}</h3>
+                  <button onClick={() => handelSubItemsCount(product._id)}>
+                    -
+                  </button>
                 </div>
                 <div class="cart-item-price">
                   <h3>${product.price}</h3>

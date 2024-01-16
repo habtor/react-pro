@@ -102,7 +102,7 @@ export default function CoffeeTypes() {
                 />
               </div>
               <div class="bean-info">
-                <h3>Arabica</h3>
+                <h3>Excelsa</h3>
                 <ul>
                   <li>
                     <strong> - Used for instant coffee.</strong>
